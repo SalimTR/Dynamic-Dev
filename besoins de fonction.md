@@ -5,3 +5,5 @@ ok c deja envoyer dans le fichier main.c;
 merci pour cette réponse rapide;
 merci pour votre merci ;
 de rien pour votre merci de mon merci;
+de rien pour votre de rien de mon merci pour votre merci 
+
