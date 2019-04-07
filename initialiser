@@ -1,0 +1,28 @@
+#include "fonctions.h"
+void initialiser(SDL_Surface *screen)
+{
+SDL_Rect positionscreen,position;
+SDL_Surface *image,*fond;
+//ecran
+if(SDL_Init(SDL_INIT_VIDEO)!=0)
+{
+printf("Unable to initialize SDL: %s\n",SDL_GetError());
+return 1;
+}
+
+screen= SDL_SetVideoMode(1600,400,0,SDL_HWSURFACE | SDL_DOUBLEBUF);
+if(screen==NULL)
+{
+printf("Unable to set video mode: %s\n",SDL_GetError());
+return 1;
+}
+positionscreen.x=0;
+positionescreen.y=0;
+fond =SDL_LoadBMP("background.bmp");
+//images
+image=IMG_Load("detective.png");
+SDL_SetColorKey(image,SDL_SRCCOLORKEY,SDL_MapRGB(image->format,255,255,255));
+
+position.x=0;
+position.y=220;
+}

@@ -1,0 +1,8 @@
+#include "fonctions.h"
+void afficher(SDL_Surface *screen,SDL_Rect position,SDL_Rect positionscreen)
+{
+SDL_BlitSurface(fond, NULL, screen, &positionscreen);
+SDL_BlitSurface(image, NULL, screen ,&position);
+SDL_Flip(screen);
+}
+

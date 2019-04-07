@@ -1,0 +1,66 @@
+#include "fonctions.h"
+
+SDL_Rect deplacement()
+{
+int continuer=1;
+    SDL_Event event;
+    SDL_Rect position;
+SDL_EnableKeyRepeat(10, 10);
+while(continuer=1)
+{
+        SDL_WaitEvent(&event);
+        switch(event.type)
+        {
+         
+            case SDL_QUIT:
+                continuer = 0;
+                break;
+
+            case SDL_KEYDOWN:
+                switch(event.key.keysym.sym)
+                {
+                case SDLK_ESCAPE:
+                  continuer = 0;
+                   break;
+                    case SDLK_UP:
+			{
+                        position.y-=40;
+                        break;
+                    case SDLK_DOWN:
+                        position.y+=40;
+                        break;
+                    case SDLK_RIGHT:
+                        position.x+=40;
+                        break;
+                    case SDLK_LEFT:
+                        position.x-=40;
+                        break;
+			SDL_Delay(500);
+                }
+                break;
+int dep=40; 
+case SDL_MOUSEBUTTONUP:
+int i,j;
+int nx=event.button.x/dep;
+int kx=event.button.x%dep; 
+int ny=event.button.y/dep;
+int ky=pos.y%dep; 
+for(i=0;i<nx;i++)
+ { 
+ pos.x+=50 ;
+ sdl_Delay(500) ;
+ }
+ pos.x+=kx; 
+SDL_Delay(500 . Dep/kx);
+for(j=0;j<ny;j++)
+ { 
+ position.y+=50 ;
+ sdl_Delay(500) ;
+ }
+ position.y+=ky; 
+SDL_Delay(500 . Dep/ky);
+break;
+SDL_ShowCursor(SDL_ENABLE);
+}
+return(position);
+}

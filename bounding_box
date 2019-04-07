@@ -1,0 +1,40 @@
+#include "fonctions.h"
+
+int bounding_box(SDL_Rect position_obj1,SDL_Rect position_obj2)
+{
+int top1,top2;
+int bottom1,bottom2;
+int left1,left2;
+int right1,right2;
+
+int k=0;
+
+top1=position_obj1.y;bottom1=top1+hauteur_obj1;
+top2=position_obj2.y;bottom2=top2+hauteur_obj2;
+left1=position_obj1.x;right1=left1+longueur_obj1;
+left2=position_obj2.x;right2=left2+longueur_obj2;
+
+if( bottom1 < top2 )
+    {
+	k=1;
+        return(k);
+    }
+ 
+    if( top1 > bottom2 )
+    {
+	k=1;
+        return(k);
+    }
+ 
+    if( right1 < left2 )
+    {
+	k=1;
+        return(k);
+    }
+    if( left1 > right2 )
+    {
+	k=1;
+        return(k);
+    }
+return(k);
+}

@@ -1,0 +1,36 @@
+#include "fonctions.h"
+
+int bounding_box_ecran(SDL_Rect position_obj1)
+{
+int top;
+int bottom;
+int right;
+int left;
+
+top1=position_obj1.y;
+bottom1=top1+hauteur_obj1;
+left1=position_obj1.x;
+right1=left1+longueur_obj1;
+
+int k=0;
+if(top-40<0)
+{
+k=1;
+return k;
+}
+if(bottom+40>1080)
+{
+k=1;
+return k;
+}
+if(right-40>1980)
+{
+k=1;
+return k;
+}
+if(left-40<0)
+{
+k=1;
+return k;
+}
+}
