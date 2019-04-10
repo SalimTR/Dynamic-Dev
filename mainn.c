@@ -4,7 +4,7 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 
-void animation(SDL_Surface* faces,SDL_Surface* screen, int x,int y,int test)
+void animation(SDL_Surface* sprite,SDL_Surface* screen, int x,int y,int test)
 {
 const int SHEET_WIDTH = x;
 const int SHEET_HEIGHT = y;
@@ -116,7 +116,7 @@ SDL_Rect clip[ 10 ];
       
          if(test==0)
           {
-         SDL_BlitSurface( clip[j],NULL, screen,&pos1);
+         SDL_BlitSurface( sprite,&clip[j], screen,&pos1);
          SDL_Flip(screen);
         
          SDL_Delay(300);
@@ -128,7 +128,7 @@ SDL_Rect clip[ 10 ];
 else if(test==1)
 {
    
-         SDL_BlitSurface( faces,&clip[i], screen,&pos);
+         SDL_BlitSurface( sprite,&clip[i], screen,&pos);
          SDL_Flip(screen);
          SDL_Delay(300);
         i++;
@@ -147,9 +147,9 @@ SDL_Surface* screen = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE|SDL_DOUBLEBUF
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
- SDL_Surface *faces = IMG_Load("sprite.png");
+ SDL_Surface * = IMG_Load("sprite.png");
  SDL_FillRect( screen, &screen->clip_rect, SDL_MapRGB( screen->format, 0xFF, 0xFF, 0xFF ) );
- animation(faces,screen,130,180,0);	
+ animation(sprite,screen,130,180,0);	
 }
 
 
