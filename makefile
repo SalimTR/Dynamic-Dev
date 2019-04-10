@@ -1,6 +1,10 @@
-progs:main.o function.o
-	gcc main.o function.o -o progs -lSDL -lSDL_image -lSDL_mixer -lm -g
+prog:*.h *.c
+	gcc *.h *.c -lSDL -lSDL_ttf -lSDL_image -lSDL_mixer -lm  -o salim -g
 main.o:main.c
-	gcc -c main.c -g 
-Trigo.o:function.c
-	gcc -c function.c -g 
+	gcc -c main.c -g
+enemy.o:enemy.c
+	gcc -c enemy.c -g
+clean:
+	rm -fr *.o
+mrproper:clean
+	rm -f prog
