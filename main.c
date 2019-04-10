@@ -9,8 +9,58 @@
 #include <time.h> 
 #include <unistd.h>
 #include "function.h"
-#include "fgifsdl.h"
+#define STAT_SOL 0
+#define STAT_AIR 1
+typedef struct
+{
+	int status;
+	float x,y;
+	float vx,vy;
+} Sprite;
 
+void InitSprite(Sprite* Sp)
+{
+	Sp->x = 50.0f;
+	Sp->y = 400.0f;
+	Sp->status = STAT_SOL;
+	Sp->vx = Sp->vy = 0.0f;
+}
+
+void Render(Sprite* Sp,SDL_Surface* screen)
+{
+	SDL_Surface *image=NULL;
+	SDL_Rect R;
+        image=IMG_Load("uRunning/test1.png");
+	R.x = Sp->x;
+	R.y = Sp->y;
+	R.w = 20;
+	R.h = 40;
+	SDL_BlitSurface(image, NULL, screen, &R);
+}
+
+void Saute(Sprite* Sp,float impulsion)
+{
+	Sp->vy = -impulsion;
+	Sp->status = STAT_AIR;
+}
+
+void ControleSol(Sprite* Sp,int i)
+{
+	if (i>400.0f)
+	{
+		i = 400.0f;
+		if (Sp->vy>0)
+			Sp->vy = 0.0f;
+		Sp->status = STAT_SOL;
+	}
+}
+
+void Gravite(Sprite* Sp,float factgravite,float factsautmaintenu,SDL_Event keys)
+{
+	if (Sp->status == STAT_AIR && (keys.key.keysym.sym ==SDLK_SPACE))
+		factgravite/=factsautmaintenu;
+	Sp->vy += factgravite;
+}
 int main()
 {
     const unsigned int windowWidth = 1900;
@@ -40,12 +90,21 @@ int main()
 
 	// ------------------Declaration events------------------//
 
-		SDL_Event event;
+		SDL_Event keys;
+        Sprite S;
+        float lateralspeed = 3.0f;
+	float airlateralspeedfacteur = 4.0f;
+	float maxhspeed = 3.0f;
+	float adherance = 1.5f;
+	float impulsion = 10.0f;
+	float factgravite = 0.5f;
+	float factsautmaintenu = 3.0f;
+	Uint32 timer,elapsed;
 
 	// ------------------Declaration variables------------------//
 
 		int continuer=1;
-		int x,y,i=0,j=0,run=0,ht=0;
+		int x,y,i=0,j=0,run=0,ht=0,c=1,d=173;
 		int pl,bx,R,G,B;
 
 	// ------------------Declaration music et son------------------//
@@ -54,10 +113,10 @@ int main()
 		Mix_Chunk *son;
 
 	// ------------------Initialisatis des images------------------//
-	
+		InitSprite(&S);
 		initialisation_background(&background,&positionecran);
 		initialisation_player(&test1,&test2,&rx,&r1,&r2,&r3,&r4,&r5,&r6,&r7,&r8,&r9,&r10,&r11,&r12,&ur1,&ur2,&ur3,&ur4,&ur5,&ur6,&r7,&ur8,&ur9,&ur10,&ur11,&ur12,&rx_pos,&urx_pos);
-		positionbox=initialiser_img(4400,430,&box,"objets/wood_box.png");
+		positionbox=initialiser_img(600,430,&box,"objets/wood_box.png");
 		positioncoin1=initialiser_img(1000,500,&coin1,"objets/coin.png");
 		positioncoin2=initialiser_img(1200,500,&coin2,"objets/coin.png");
 		positioncoin3=initialiser_img(1400,500,&coin3,"objets/coin.png");
@@ -87,6 +146,9 @@ int main()
 		positioncactus4=initialiser_img(6800,400,&cactus4,"objets/cactus4.png");
 		positionflor=initialiser_img(5000,200,&flor,"objets/flor.png");
         	hit=IMG_Load("Running/hit.png");
+    SDL_Rect posMarioRel;
+    posMarioRel.x = -50;
+    posMarioRel.y = 0;
 	
 	// ------------------Start Section------------------//	
 
@@ -94,28 +156,38 @@ int main()
 	    	ecran = SDL_SetVideoMode(1536, 768, 32, SDL_HWSURFACE );
 	
 
+	Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,MIX_DEFAULT_CHANNELS,1024);
+  	SDL_WM_SetCaption("The comeback", NULL);
+	/*musique*/
+	Mix_VolumeMusic(MIX_MAX_VOLUME / 2);	
+	music=Mix_LoadMUS("");	
 	
+	son=Mix_LoadWAV("coin_sound.wav");
+
+	/*fin musique*/	
 
 
  SDL_EnableKeyRepeat(10, 10);
 while(continuer)
 {
-run=0;
-SDL_PollEvent(&event);
+//run=0;
+timer = SDL_GetTicks();
+SDL_PollEvent(&keys);
 SDL_GetMouseState(&x,&y);
-switch(event.type)
+// controle lateral
+	if (S.status == STAT_AIR) // (*2)
+		lateralspeed*= airlateralspeedfacteur;
+switch(keys.type)
 {
 case SDL_QUIT:
-continuer = 1;
+continuer = 0;
 break;
 
 case SDL_KEYDOWN:
-switch(event.key.keysym.sym)
-{case SDLK_ESCAPE://appuyer sur echap
+if (keys.key.keysym.sym==SDLK_ESCAPE)
 continuer = 0;
-break;
- case 
-SDLK_LEFT:
+if (keys.key.keysym.sym==SDLK_LEFT)
+{
 if(j%6==0)
 {urx=ur1;}
 else if(j%6==1)
@@ -160,9 +232,9 @@ positioncactus2.x+=10;
 positioncactus3.x+=10;
 positioncactus4.x+=10;
 }
-break;
-case
-SDLK_RIGHT:
+}
+if (keys.key.keysym.sym==SDLK_RIGHT)
+{
 if(i%6==0)
 {rx=r1;}
 else if(i%6==1)
@@ -209,28 +281,41 @@ positioncactus3.x-=10;
 positioncactus4.x-=10;
 }
 run=2;
-break;
-case
-SDLK_UP:
-	
-default:
-break;
 }
+if (S.status == STAT_SOL && !(keys.key.keysym.sym ==SDLK_LEFT) && !(keys.key.keysym.sym ==SDLK_RIGHT)) // (*3)
+		S.vx/=adherance;
+// limite vitesse
+	if (S.vx>maxhspeed) // (*4)
+		S.vx = maxhspeed;
+	if (S.vx<-maxhspeed)
+		S.vx = -maxhspeed;
+if (keys.key.keysym.sym==SDLK_SPACE && S.status == STAT_SOL)
+{
+run=3;
+Saute(&S,impulsion);
+}
+
+
 break;
 default:
 break;}
+Gravite(&S,factgravite,factsautmaintenu,keys);
+	ControleSol(&S,rx_pos.y);
+// application du vecteur à la position.
+	rx_pos.x +=S.vx;
+	rx_pos.y +=S.vy;
 
 		R=0;
 		G=0;
 		B=0;
-		if (trigooo(positionbox,box,rx_pos,rx))
+		if (bounding_box(rx,rx_pos,box,positionbox)==0)
 		{
 			positionbox.x+=10;
 			R = 200;
 			G = 45;
 			B = 69;
 		}
-		/*if (trigooo(positioncactus1,cactus1,rx_pos,rx))
+		if (trigooo(positioncactus1,cactus1,rx_pos,rx))
 		{
 			ht++;
 			if(ht>3){ht=0;}
@@ -253,11 +338,98 @@ break;}
 			ht++;
 			if(ht>3){ht=0;}
 			rx_pos.x-=50;
-		}*/
+		}
 		if (trigooo(positioncoin1,coin1,rx_pos,rx))
 		{
-			//coin1=NULL;
+			positioncoin1.x=positioncoin1.x-4000;
+			Mix_PlayChannel(-1,son,0);
 		}
+		if (trigooo(positioncoin2,coin2,rx_pos,rx))
+		{
+			positioncoin2.x=positioncoin2.x-4000;
+			Mix_PlayChannel(-1,son,0);
+		}
+		if (trigooo(positioncoin3,coin3,rx_pos,rx))
+		{
+			positioncoin3.x=positioncoin3.x-4000;
+			Mix_PlayChannel(-1,son,0);
+		}
+		if (trigooo(positioncoin4,coin4,rx_pos,rx))
+		{
+			positioncoin4.x=positioncoin4.x-4000;
+			Mix_PlayChannel(-1,son,0);
+		}
+		if (trigooo(positioncoin5,coin5,rx_pos,rx))
+		{
+			positioncoin5.x=positioncoin5.x-4000;
+			Mix_PlayChannel(-1,son,0);
+		}
+		if (trigooo(positioncoin6,coin6,rx_pos,rx))
+		{
+			positioncoin6.x=positioncoin6.x-4000;
+			Mix_PlayChannel(-1,son,0);
+		}
+		if (trigooo(positioncoin7,coin7,rx_pos,rx))
+		{
+			positioncoin7.x=positioncoin7.x-4000;
+			Mix_PlayChannel(-1,son,0);
+		}
+		if (trigooo(positioncoin8,coin8,rx_pos,rx))
+		{
+			positioncoin8.x=positioncoin8.x-4000;
+			Mix_PlayChannel(-1,son,0);
+		}
+		if (trigooo(positioncoin9,coin9,rx_pos,rx))
+		{
+			positioncoin9.x=positioncoin9.x-4000;
+			Mix_PlayChannel(-1,son,0);
+		}
+		if (trigooo(positioncoin10,coin10,rx_pos,rx))
+		{
+			positioncoin10.x=positioncoin10.x-4000;
+			Mix_PlayChannel(-1,son,0);
+		}
+		if (trigooo(positioncoin11,coin11,rx_pos,rx))
+		{
+			positioncoin11.x=positioncoin11.x-4000;
+			Mix_PlayChannel(-1,son,0);
+		}
+		if (trigooo(positioncoin12,coin12,rx_pos,rx))
+		{
+			positioncoin12.x=positioncoin12.x-4000;
+			Mix_PlayChannel(-1,son,0);
+		}
+		if (trigooo(positioncoin13,coin13,rx_pos,rx))
+		{
+			positioncoin13.x=positioncoin13.x-4000;
+			Mix_PlayChannel(-1,son,0);
+		}
+		if (trigooo(positioncoin14,coin14,rx_pos,rx))
+		{
+			positioncoin14.x=positioncoin14.x-4000;
+			Mix_PlayChannel(-1,son,0);
+		}
+		if (trigooo(positioncoin15,coin15,rx_pos,rx))
+		{
+			positioncoin15.x=positioncoin15.x-4000;
+			Mix_PlayChannel(-1,son,0);
+		}
+		if (trigooo(positioncoin16,coin16,rx_pos,rx))
+		{
+			positioncoin16.x=positioncoin16.x-4000;
+			Mix_PlayChannel(-1,son,0);
+		}
+		if (trigooo(positioncoin17,coin17,rx_pos,rx))
+		{
+			positioncoin17.x=positioncoin17.x-4000;
+			Mix_PlayChannel(-1,son,0);
+		}
+		if (trigooo(positioncoin18,coin18,rx_pos,rx))
+		{
+			positioncoin18.x=positioncoin18.x-4000;
+			Mix_PlayChannel(-1,son,0);
+		}
+
 
 	// ------------------Affichage des images------------------//	
 
@@ -292,29 +464,31 @@ break;}
 		{
 		affichage_img(ecran,heart2,positionheart2);
 		SDL_BlitSurface(hit, NULL, ecran, &rx_pos);
-		ht=0;
+		//ht=0;
 		}
 		else
 		if (ht==2)
 		{
 		affichage_img(ecran,heart1,positionheart1);
 		SDL_BlitSurface(hit, NULL, ecran, &rx_pos);
-		ht=0;
+		//ht=0;
 		}
 		else
 		if (ht==3)
 		{
 		affichage_img(ecran,heart0,positionheart0);
 		SDL_BlitSurface(hit, NULL, ecran, &rx_pos);
-		ht=0;
+		//ht=0;
 		}
 		else
 		{affichage_img(ecran,heart3,positionheart3);}
+		//Render(&S,ecran);
 		affichage_player(test1,test2,ecran,rx,urx,rx_pos,urx_pos,run);
 		
 				SDL_Flip(ecran);
                   SDL_Delay(0);
 		printf("%d \t %d \n",x,y);
+		printf("position player=%d \n",rx_pos.x);
 
 
 	}

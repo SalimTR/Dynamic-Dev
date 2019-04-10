@@ -11,4 +11,6 @@ void initialisation_coin(SDL_Surface **coin,SDL_Rect *positioncoin);
 //void affichage_box(SDL_Surface *ecran,SDL_Surface *coin,SDL_Rect positioncoin);	
 int trigooo(SDL_Rect pA,SDL_Surface *A,SDL_Rect pB,SDL_Surface *B);
 SDL_Rect initialiser_img(int x,int y,SDL_Surface **image,char *imagename);
+int bounding_box(SDL_Surface *obj1,SDL_Rect position_obj1,SDL_Surface *obj2,SDL_Rect position_obj2);
+
 #endif
