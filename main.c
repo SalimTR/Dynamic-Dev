@@ -1,86 +1,104 @@
-#include "enemy.h"
-
-#define LARGEUR 1280
-#define HAUTEUR 705
-#define bpp 32
-
-void deplacement(int direction,SDL_Rect *pos);
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 int main()
-{   SDL_Init(SDL_INIT_EVERYTHING);
-    ennemie E;
-    char image_name[20]="./assets/pics/1.png";
-    E.image=NULL;
-    SDL_Surface *screen = NULL, *background=NULL;
-    SDL_Event event;
-    SDL_Rect background_Rect;
-    //varGameLoop /        VarsOfFPS        / VarPosImage
-    int ProgRun=1,now=0,ex=0,periodFPS=33,dt=0,x,y;
-    int direction=1;
-    screen=SDL_SetVideoMode(LARGEUR,HAUTEUR,bpp,SDL_HWSURFACE| SDL_DOUBLEBUF);
-    SDL_WM_SetCaption("Ennemie",NULL);
-    //Initialisation background:
-    SDL_Surface* tmp=NULL;
-    tmp=IMG_Load("./assets/pics/background.bmp");
-    background=SDL_DisplayFormat(tmp);
-    SDL_FreeSurface(tmp);
-    background_Rect.y=HAUTEUR/4;
-    //fin init background:
-
-    //affichage background:
-  	SDL_BlitSurface(background,NULL,screen,&background_Rect);
-    SDL_Flip(screen);
-
-    //Initialisation ennemie:
-    Initialiser_Ennemie(&E,screen,image_name);
-    //GameLOOP:
-    while(ProgRun)
-       {
-	 	 now=SDL_GetTicks();
-		 dt=now-ex;
-         if(dt>periodFPS){
-            SDL_PollEvent(&event);
-            switch(event.type)
-	        {
-	           case SDL_QUIT:
-	           ProgRun=0;
-	           break;
-	           case SDL_KEYDOWN:
-	           switch(event.key.keysym.sym)
-		       {
-			   case SDLK_ESCAPE:
-		       	   ProgRun=0;
-			   break;
-			   }
-	           break;
-	           case SDL_KEYUP:
-	           break;
-	           default:
-	           break;
-			}
-        deplacement(direction,&E.PositionImage);
-        if(E.PositionImage.x==590)
-            direction=2;
-        if(E.PositionImage.x==10)
-            direction=1;
-			SDL_FillRect(screen,NULL,0);
-		   	SDL_BlitSurface(background,NULL,screen,&background_Rect);    		
-            Afficher_Ennemie(&E,screen);
-            SDL_Flip(screen);
-    	 	ex=now;}
-	else SDL_Delay(periodFPS-dt);
-    	}
-    //Fonction FREE:
-    SDL_FreeSurface(background);
-    SDL_FreeSurface(E.image);
-
-    SDL_Quit();
-    return EXIT_SUCCESS;
-}
-void deplacement(int direction,SDL_Rect *pos)
 {
-if(direction==1)
-    pos->x++;
+    char question[100];
+    char file[200];
+    char reponse1[20];
+    char reponse2[20];
+    char reponse3[20];
+    int a=0;
+    int i1=0;
+    int i2=0;
+    int i3=0;
+    int x;
+    int correcte=0;
+    char T[5][20]={"quiz.txt","quiz1.txt","quiz2.txt"};
+    srand(time(NULL));
+    int rep;
+    x= rand()%(3);
+    printf("%d \n",x);
+    printf("%s \n",T[x]);
+    char fich[20];
+    strcpy(fich,T[x]);
+    printf("%s \n",fich);
+FILE* quiz = NULL ;
+quiz = fopen(fich,"r");
+            fgets(file,300,quiz);
+            printf("fichier %s",file);
+while(file[a-1]!='?')
+{
+    question[a]=file[a];
+    a++;
+}
+question[a]='\0';
+printf("question :%s \n",question);
+int b=a+1;
+while(file[b]!=' ')
+{
+    if (file[b]!='*')
+    {
+    reponse1[i1]=file[b];
+    b++;
+    i1++;
+    }
+    if(file[b]=='*')
+    {
+        correcte=1;
+        b++;
+    }
+}
+reponse1[i1]='\0';
+printf("reponse1: %s \n",reponse1);
+int c=b+1;
+while(file[c]!=' ')
+{
+    if(file[b]!='*')
+    {
+    reponse2[i2]=file[c];
+    c++;
+    i2++;
+    }
+    if(file[c]=='*')
+    {
+        correcte=2;
+        c++;
+    }
+}
+reponse2[i2]='\0';
+printf("reponse2: %s \n",reponse2);
+int d=c+1;
+while(file[d]!=' ')
+{
+    if(file[d]!='*')
+    {
+    reponse3[i3]=file[d];
+    d++;
+    i3++;
+    }
+    if(file[d]=='*')
+    {
+        correcte=3;
+        d++;
+    }
+}
+reponse3[i3]='\0';
+printf("reponse3: %s \n",reponse3);
+printf("rep correcte: %d \n",correcte);
+do{
+printf("saisir une reponses \n");
+scanf("%d",&rep);
+if(rep!=correcte)
+{
+    printf("reponse fausse \n");
+}
 else
-    pos->x--;
+{
+    printf("reponse correcte \n");
+}
+}while(rep!=correcte);
+    return 0;
 }
